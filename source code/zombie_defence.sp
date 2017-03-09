@@ -12,6 +12,10 @@ Handle hEnabled;
 Handle hAutoBhop;
 Handle hDefenderHealth;
 Handle hZombieHealth;
+Handle hZombieCanBhop;
+Handle hDefenderCanBhop;
+int zombieCanBhop;
+int defenderCanBhop;
 int defenderHealth;
 int zombieHealth;
 
@@ -31,8 +35,12 @@ public void OnPluginStart()
 	hEnabled = CreateConVar("zombie_defence", "1", "Enable/disable zombie defence plugin", FCVAR_PLUGIN|FCVAR_NOTIFY|FCVAR_REPLICATED);
 
 	// Bhop
-	hAutoBhop = CreateConVar("auto_bhop", "1", "Enable/Disable bhopping", FCVAR_PLUGIN|FCVAR_NOTIFY|FCVAR_REPLICATED);
-	if (GetConVarInt(hEnabled) == 1) BhopOn();
+	hAutoBhop = CreateConVar("auto_bhop", "1", "Enable/disable auto bhopping", FCVAR_PLUGIN|FCVAR_NOTIFY|FCVAR_REPLICATED);
+	hZombieCanBhop = CreateConVar("zombie_can_bhop", "1", "Enable/disable bhopping for zombies", FCVAR_PLUGIN|FCVAR_NOTIFY|FCVAR_REPLICATED);
+	hDefenderCanBhop = CreateConVar("defender_can_bhop", "1", "Enable/disable bhopping for defenders", FCVAR_PLUGIN|FCVAR_NOTIFY|FCVAR_REPLICATED);
+	zombieCanBhop = GetConVarInt(hZombieCanBhop);
+	defenderCanBhop = GetConVarInt(hDefenderCanBhop);
+	if (GetConVarInt(hEnabled) == 1) { BhopOn(); ZombieDefenceOn(); }
 
 	// Zombie defence
 	hDefenderHealth = CreateConVar("defender_health", "40", "The starting healh of the defenders", FCVAR_PLUGIN|FCVAR_NOTIFY|FCVAR_REPLICATED);
@@ -68,6 +76,9 @@ void ZombieDefenceOn()
 	SetCvar("mp_autokick", "0");
 	SetCvar("mp_respawn_on_death_t", "1");
 	SetCvar("mp_solid_teammates", "1");
+	SetCvar("mp_death_drop_gun", "0");
+	SetCvar("mp_death_drop_grenade", "1");
+	SetCvar("mp_give_player_c4", "0");
 
 	SetCvar("mp_restartgame", "5");
 }
@@ -93,10 +104,11 @@ stock void SetCvar(char[] scvar, char[] svalue)
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon)
 {
 	if(GetConVarInt(hEnabled) == 1 && GetConVarInt(hAutoBhop) == 1) //Check if plugin and autobhop is enabled
-		if (IsPlayerAlive(client) && buttons & IN_JUMP) //Check if player is alive and is in pressing space
-			if(!(GetEntityMoveType(client) & MOVETYPE_LADDER) && !(GetEntityFlags(client) & FL_ONGROUND)) //Check if is not in ladder and is in air
-				if(WaterCheck(client) < WATER_LIMIT)
-					buttons &= ~IN_JUMP; 
+		if ((GetClientTeam(client) == ZOMBIE_TEAM && zombieCanBhop) || (GetClientTeam(client) == DEFENDER_TEAM && defenderCanBhop)) // Check if player can bhop based on team
+			if (IsPlayerAlive(client) && buttons & IN_JUMP) //Check if player is alive and is in pressing space
+				if(!(GetEntityMoveType(client) & MOVETYPE_LADDER) && !(GetEntityFlags(client) & FL_ONGROUND)) //Check if is not in ladder and is in air
+					if(WaterCheck(client) < WATER_LIMIT)
+						buttons &= ~IN_JUMP; 
 	return Plugin_Continue;
 }
 
