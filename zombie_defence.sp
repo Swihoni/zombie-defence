@@ -5,7 +5,7 @@
 #pragma newdecls required // 2015 rules 
 #define PLUGIN_VERSION "1.0"
 #define WATER_LIMIT 2
-#define DEFENDER_TEAM 1
+#define DEFENDER_TEAM 3
 #define ZOMBIE_TEAM 2
 
 Handle hEnabled;
