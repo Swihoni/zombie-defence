@@ -53,11 +53,23 @@ public Action PreThink(int client)
 
 void BhopOn()
 {
-	SetCvar("sv_enablebunnyhopping"	, "1"	); 
-	SetCvar("sv_staminamax"			, "0"	);
-	SetCvar("sv_airaccelerate"		, "2000");
-	SetCvar("sv_staminajumpcost"	, "0"	);
-	SetCvar("sv_staminalandcost"	, "0"	);
+	SetCvar("sv_enablebunnyhopping", "1"); 
+	SetCvar("sv_staminamax", "0");
+	SetCvar("sv_airaccelerate", "2000");
+	SetCvar("sv_staminajumpcost", "0");
+	SetCvar("sv_staminalandcost", "0");
+}
+
+void ZombieDefenceOn()
+{
+	SetCvar("mp_buytime", "100");
+	SetCvar("mp_autoteambalance", "0");
+	SetCvar("mp_limitteams", "0");
+	SetCvar("mp_autokick", "0");
+	SetCvar("mp_respawn_on_death_t", "1");
+	SetCvar("mp_solid_teammates", "1");
+
+	SetCvar("mp_restartgame", "5");
 }
 
 public void PlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
